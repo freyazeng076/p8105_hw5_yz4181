@@ -176,3 +176,28 @@ all_participant_df %>%
   theme(axis.text.x = element_text(angle = 90, vjust =0.5, hjust = 1))
 ```
 
+
+## Problem 3
+```{r}
+set.seed(10)
+
+iris_with_missing = iris %>% 
+  map_df(~replace(.x, sample(1:150, 20), NA)) %>%
+  mutate(Species = as.character(Species))
+
+fill_in_function = function(x) {
+  if (is.numeric(x)) {
+    x_mean = mean(x, na.rm = TRUE)
+    x = replace_na(x, x_mean)
+  }
+  
+  if(is.character(x)) {
+    x = replace_na(x, "virginica")
+  }
+  
+  return(x)
+}
+
+iris = map(iris_with_missing, fill_in_function)
+```
+
