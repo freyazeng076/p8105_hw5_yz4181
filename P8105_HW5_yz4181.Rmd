@@ -6,6 +6,7 @@ output: github_document
 ---
 ```{r stepup, echo=FALSE}
 library(tidyverse)
+
 ```
 
 ## Problem 1
@@ -137,5 +138,41 @@ result_df %>%
     x = "City_State",
     y = "Estimate"
   )
+```
+
+
+## Problem 2
+```{r, message=FALSE}
+## Create a dataframe for all participants
+all_participant_df = tibble(
+  file_name = list.files(path = "./data/")) %>% 
+  mutate(
+    path = str_c("./data/", file_name),
+    data = map(path, read_csv)) %>% 
+  unnest(data) %>% 
+  separate(
+    file_name, into = c("arm","subject_id"), sep = "_") %>% 
+  mutate(
+    subject_id = str_replace(subject_id, ".csv", " ")) %>% 
+  select(-path) %>% 
+  print()
+
+## Create a dataframe for participants in control arm
+con_df = all_participant_df %>% 
+  filter(arm == "con") %>% 
+  print()
+```
+
+### Making spaghetti plot
+```{r}
+all_participant_df %>% 
+  pivot_longer(
+    week_1:week_8,
+    names_to = "week",
+    values_to = "weekly_observation") %>% 
+  ggplot(aes(x = week, y = weekly_observation, group = subject_id)) +
+    geom_line(aes(color = subject_id)) +
+   facet_grid(~arm) +
+  theme(axis.text.x = element_text(angle = 90, vjust =0.5, hjust = 1))
 ```
 
