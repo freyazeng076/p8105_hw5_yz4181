@@ -127,7 +127,7 @@ homicide_df %>%
   select(city_state, estimate, starts_with("conf"))
   
 ```
-* Summary: The table shows the estimate proportion of unsolved homocides and confident interval within each city.
+* Summary: The table shows the estimate proportion of unsolved homicides and confident interval within each city.
 
 
 #### Creata a plot show the estimate and CI for each city
@@ -143,12 +143,15 @@ result_df %>%
   theme(axis.text.x = element_text(angle = 90, vjust =0.5, hjust = 1)) +
   labs(
     x = "City_State",
-    y = "Estimate"
+    y = "Estimate",
+    title = "Estimate and CIs for each city"
   )
 ```
 
 
 ## Problem 2
+
+#### Create a tidy dataframe containing data from all participants, including the subject ID, arm, and observations over time
 ```{r, message=FALSE}
 ## Create a dataframe for all participants
 all_participant_df = tibble(
@@ -169,23 +172,28 @@ all_participant_df = tibble(
   mutate(
     week = as.numeric(week)
   ) %>%  print()
-  
+```
+* Using the `list.files` to read the file_name and create a new variable containing the path for each file. Using `map` function to read all the results into a new variable containing a list of data. Then `unnest` the list and tidy the result. The data frame contains 160 observation and 4 variables. The variables include arms, subject_id, week, and observation. The data record the observation of each subject in controlled and experimental arms over 8 weeks.
 
-
-## Create a dataframe for participants in control arm
+####Create a dataframe for participants in controlled arm
+```{r}
 con_df = all_participant_df %>% 
   filter(arm == "con") %>% 
   print()
 ```
+* The data frame only include the observation for each subject in controlled arm. There is 80 observation and 4 variables.
 
 ### Making spaghetti plot
 ```{r}
 all_participant_df %>% 
   ggplot(aes(x = week, y = observation, color = arm, type = subject_id)) +
-    geom_line() +
-  theme(axis.text.x = element_text(angle = 90, vjust =0.5, hjust = 1))
+  geom_line() +
+  labs(
+    title = "Spaghetti Plot for observation of patients in controlled and experimental arm"
+  )
+
 ```
-* Comments: Comparing two arms, we notice that the observation for all patients in experience arm are increasing over eight weeks. However, the observations for patients in control arm are relatively stable over the time. 
+* Comments: Comparing two arms, we notice that the observation for all patients in experimental arm are increasing over eight weeks. However, the observations for patients in controlled arm are relatively stable over the time. 
 
 
 ## Problem 3
@@ -211,4 +219,4 @@ fill_in_function = function(x) {
 
 iris = map_df(iris_with_missing, fill_in_function) %>%  print()
 ```
-
+* First, I write a function to fill in the missing value in the data frame. Then using `map` to iterate each column in the data frame. If variable is numeric, `NA` is replaced by the mean of non-missing value. If the variable is character, missing value is replaced by "Virginian". 
