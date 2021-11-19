@@ -6,7 +6,6 @@ output: github_document
 ---
 ```{r stepup, echo=FALSE}
 library(tidyverse)
-
 ```
 
 ## Problem 1
@@ -46,7 +45,7 @@ number_unsolved = homicide_df %>%
 
 summary_within_city = left_join(number_unsolved, total_homocide) %>%  print()
 ```
-* Summary: The table showing the number of unsolved homocides and total number of homocides in each city.
+* Summary: The table showing the number of unsolved homicides and total number of homicides in each city.
 
 
 #### Look at the homicides in the city of Baltimore, MD
@@ -175,6 +174,7 @@ all_participant_df %>%
    facet_grid(~arm) +
   theme(axis.text.x = element_text(angle = 90, vjust =0.5, hjust = 1))
 ```
+* Comments: Comparing two arms, we notice that the observation for all patients in experience arm are increasing over eight weeks. However, the observations for patients in control arm are relatively stable over the time. 
 
 
 ## Problem 3
