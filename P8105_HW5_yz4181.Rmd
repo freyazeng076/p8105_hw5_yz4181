@@ -6,6 +6,14 @@ output: github_document
 ---
 ```{r stepup, echo=FALSE}
 library(tidyverse)
+
+knitr::opts_chunk$set(
+  echo = TRUE, message = FALSE, warning = FALSE,
+  fig.width = 8,
+  fig.height = 6,
+  out.width = "80%",
+  dpi = 300
+)
 ```
 
 ## Problem 1
@@ -147,14 +155,22 @@ all_participant_df = tibble(
   file_name = list.files(path = "./data/")) %>% 
   mutate(
     path = str_c("./data/", file_name),
-    data = map(path, read_csv)) %>% 
+    data = map(path, read_csv)) %>%         ## data is a variable that contain all results
   unnest(data) %>% 
-  separate(
-    file_name, into = c("arm","subject_id"), sep = "_") %>% 
+  separate(file_name, into = c("arm", "subject_id"), sep = "_") %>% 
   mutate(
-    subject_id = str_replace(subject_id, ".csv", " ")) %>% 
-  select(-path) %>% 
-  print()
+    subject_id = str_remove(subject_id, ".csv")
+  ) %>% select(-path) %>% 
+    pivot_longer(
+    week_1:week_8,
+    names_to = "week",
+    values_to = "observation",
+    names_prefix = "week_") %>% 
+  mutate(
+    week = as.numeric(week)
+  ) %>%  print()
+  
+
 
 ## Create a dataframe for participants in control arm
 con_df = all_participant_df %>% 
@@ -165,13 +181,8 @@ con_df = all_participant_df %>%
 ### Making spaghetti plot
 ```{r}
 all_participant_df %>% 
-  pivot_longer(
-    week_1:week_8,
-    names_to = "week",
-    values_to = "weekly_observation") %>% 
-  ggplot(aes(x = week, y = weekly_observation, group = subject_id)) +
-    geom_line(aes(color = subject_id)) +
-   facet_grid(~arm) +
+  ggplot(aes(x = week, y = observation, color = arm, type = subject_id)) +
+    geom_line() +
   theme(axis.text.x = element_text(angle = 90, vjust =0.5, hjust = 1))
 ```
 * Comments: Comparing two arms, we notice that the observation for all patients in experience arm are increasing over eight weeks. However, the observations for patients in control arm are relatively stable over the time. 
@@ -191,13 +202,13 @@ fill_in_function = function(x) {
     x = replace_na(x, x_mean)
   }
   
-  if(is.character(x)) {
+  if (is.character(x)) {
     x = replace_na(x, "virginica")
   }
   
   return(x)
 }
 
-iris = map(iris_with_missing, fill_in_function)
+iris = map_df(iris_with_missing, fill_in_function) %>%  print()
 ```
 
